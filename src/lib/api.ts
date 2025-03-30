@@ -100,7 +100,7 @@ interface AddToCartPayload {
   quantity: number;
 }
 
-interface CartItemResponse {
+export interface CartItemResponse {
   id: string;
   userId: string;
   itemId: string;
@@ -116,10 +116,56 @@ interface AddToCartResponse {
   item: CartItemResponse;
 }
 
+interface CheckoutPayload {
+  userId: string;
+  discountCode?: string;
+}
+
+interface OrderItemResponse {
+  id: string;
+  orderId: string;
+  itemId: string;
+  name: string;
+  price: string;
+  quantity: number;
+}
+
+export interface OrderResponse {
+  id: string;
+  userId: string;
+  subtotal: string;
+  discountCode: string | null;
+  discountAmount: string;
+  total: string;
+  createdAt: string;
+  items: OrderItemResponse[];
+}
+
+export interface CheckoutResponse {
+  message: string;
+  order: OrderResponse;
+}
+
 export const addToCart = (
   payload: AddToCartPayload,
 ): Promise<AddToCartResponse> => {
   return fetcher<AddToCartResponse>('/cart', {
+    method: 'POST',
+    payload: payload,
+  });
+};
+
+export const getUserCart = (userId: string): Promise<CartItemResponse[]> => {
+  if (!userId) {
+    return Promise.resolve([]);
+  }
+  return fetcher<CartItemResponse[]>(`/cart/${userId}`);
+};
+
+export const userCheckout = (
+  payload: CheckoutPayload,
+): Promise<CheckoutResponse> => {
+  return fetcher<CheckoutResponse>('/order/checkout', {
     method: 'POST',
     payload: payload,
   });
