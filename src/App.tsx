@@ -1,34 +1,34 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
+import { ProductCard } from './components/ProductCard';
+import { products } from './lib/products';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const handleAddToCart = (productId: string, name: string, price: number) => {
+    console.log(`Adding to cart: ${name} (ID: ${productId}, Price: ${price})`);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">E-commerce Store</h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            imageUrl={product.imageUrl}
+            description={product.description}
+            onAddToCart={handleAddToCart}
+          />
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+      <div className="text-center text-gray-500 mt-8">
+        (Cart and Admin sections will be added later)
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   );
 }
 
