@@ -243,10 +243,12 @@ function App() {
           type="text"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          placeholder="e.g., user123"
+          placeholder="user123"
         />
         <p className="text-xs text-gray-500 mt-1">
-          (Using '{userId}' for cart operations)
+          {userId
+            ? `(Using ${userId} for cart operations)`
+            : '(No user ID set)'}
         </p>
       </div>
 
