@@ -92,7 +92,7 @@ const fetcher = async <T>(
   }
 };
 
-interface AddToCartPayload {
+export interface AddToCartPayload {
   userId: string;
   itemId: string;
   name: string;
@@ -111,17 +111,17 @@ export interface CartItemResponse {
   updatedAt: string;
 }
 
-interface AddToCartResponse {
+export interface AddToCartResponse {
   message: string;
   item: CartItemResponse;
 }
 
-interface CheckoutPayload {
+export interface CheckoutPayload {
   userId: string;
   discountCode?: string;
 }
 
-interface OrderItemResponse {
+export interface OrderItemResponse {
   id: string;
   orderId: string;
   itemId: string;
@@ -144,6 +144,29 @@ export interface OrderResponse {
 export interface CheckoutResponse {
   message: string;
   order: OrderResponse;
+}
+
+export interface DiscountCodeResponse {
+  id: string;
+  code: string;
+  discountPercent: string;
+  isActive: boolean;
+  isUsed: boolean;
+  createdAt: string;
+  orderUsedInId: string | null;
+}
+
+export interface AdminStatsResponse {
+  totalOrders: number;
+  totalItemsPurchased: number;
+  totalPurchaseAmount: string;
+  discountCodesGenerated: DiscountCodeResponse[];
+  discountCodesUsed: DiscountCodeResponse[];
+  totalDiscountAmount: string;
+}
+
+export interface ActiveDiscountResponse {
+  activeDiscount: DiscountCodeResponse | null;
 }
 
 export const addToCart = (
@@ -169,4 +192,12 @@ export const userCheckout = (
     method: 'POST',
     payload: payload,
   });
+};
+
+export const apiGetAdminStats = (): Promise<AdminStatsResponse> => {
+  return fetcher<AdminStatsResponse>('/admin/stats');
+};
+
+export const apiGetActiveDiscount = (): Promise<ActiveDiscountResponse> => {
+  return fetcher<ActiveDiscountResponse>('/admin/discount/active');
 };

@@ -14,7 +14,7 @@ import {
 } from './lib/api';
 import { CartSheet } from './components/CartSheet';
 import { Button } from './components/ui/button';
-import { ShoppingCart } from 'lucide-react';
+import { ShieldCheck, ShoppingCart } from 'lucide-react';
 import { CheckoutDialog } from './components/CheckoutDialog';
 import {
   AlertDialog,
@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { AdminView } from './components/AdminView';
 
 function App() {
   const [userId, setUserId] = useState<string>('user123');
@@ -36,6 +37,7 @@ function App() {
   const [lastOrder, setLastOrder] = useState<OrderResponse | null>(null); // To show confirmation
   const [isOrderConfirmationOpen, setIsOrderConfirmationOpen] =
     useState<boolean>(false);
+  const [showAdminView, setShowAdminView] = useState<boolean>(false);
 
   const fetchCart = useCallback(async () => {
     if (!userId) {
@@ -88,6 +90,9 @@ function App() {
       toast.success(result.message || `${name} added to cart!`, {
         description: `Item ID: ${result.item.itemId}, New Quantity: ${result.item.quantity}`,
       });
+
+      const updatedCart = await getUserCart(userId);
+      setCartItems(updatedCart);
     } catch (error) {
       toast.dismiss(loadingToastId);
       if (error instanceof Error) {
@@ -198,23 +203,35 @@ function App() {
         <h1 className="text-3xl font-bold text-center flex-grow">
           E-commerce Store
         </h1>
-        <CartSheet
-          items={cartItems}
-          isLoading={isCartLoading}
-          trigger={
-            <Button variant="outline" size="icon" className="relative">
-              <ShoppingCart className="h-4 w-4" />
-              {totalCartItems > 0 && (
-                <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                  {totalCartItems}
-                </span>
-              )}
-            </Button>
-          }
-          onClearCart={handleClearCart}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleOpenCheckout}
-        />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowAdminView((prev) => !prev)}
+            aria-label="Toggle Admin View"
+          >
+            <ShieldCheck
+              className={`h-4 w-4 ${showAdminView ? 'text-primary' : ''}`}
+            />
+          </Button>
+          <CartSheet
+            items={cartItems}
+            isLoading={isCartLoading}
+            trigger={
+              <Button variant="outline" size="icon" className="relative">
+                <ShoppingCart className="h-4 w-4" />
+                {totalCartItems > 0 && (
+                  <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                    {totalCartItems}
+                  </span>
+                )}
+              </Button>
+            }
+            onClearCart={handleClearCart}
+            onRemoveItem={handleRemoveItem}
+            onCheckout={handleOpenCheckout}
+          />
+        </div>
       </div>
 
       <div className="mb-6 max-w-xs mx-auto">
@@ -233,23 +250,23 @@ function App() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            imageUrl={product.imageUrl}
-            description={product.description}
-            onAddToCart={handleAddToCart}
-          />
-        ))}
-      </div>
+      {showAdminView && <AdminView />}
 
-      <div className="text-center text-gray-500 mt-8">
-        (Cart and Admin sections will be added later)
-      </div>
+      {!showAdminView && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              imageUrl={product.imageUrl}
+              description={product.description}
+              onAddToCart={handleAddToCart}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
